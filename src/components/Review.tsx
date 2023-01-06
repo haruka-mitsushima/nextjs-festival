@@ -2,24 +2,36 @@ import styles from 'styles/review.module.css';
 import useSWR from 'swr';
 import loadStyles from 'styles/loading.module.css';
 import { Reviews } from 'types/review';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import ReviewSelect from './ReviewSort ';
 import Pagination from './Paging';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { Item } from 'types/item';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function Review({
-  itemId,
-  total,
-}: {
+type Review = {
+  reviewId: number;
   itemId: number;
-  total: number;
-}) {
-  const [num, setNum] = useState(1);
-  const [sort, setSort] = useState('reviewId&_order=desc');
+  userId: number;
+  postTime: string;
+  reviewTitle: string;
+  reviewText: string;
+  evaluation: number;
+  spoiler: boolean;
+  items: Item;
+};
 
-  const { data } = useSWR(`/api/selectReview/${itemId}`, fetcher);
+export default function Review({ itemId }: { itemId: number }) {
+  const [orderBy, setOrderBy] = useState('reviewId');
+  const [order, setOrder] = useState('desc');
+  // 選択されたページの1番目の番号
+  const [itemOffset, setItemOffSet] = useState(0);
+
+  const { data } = useSWR(
+    `/api/selectReview/${itemId}/${orderBy}/${order}`,
+    fetcher
+  );
 
   if (!data)
     return (
@@ -37,9 +49,11 @@ export default function Review({
     );
 
   const reviews = data.data;
+  const total = data.count;
 
+  // レーティング機能
   // 点数の配列のみ取り出す
-  let scoreArr = reviews.map((dataList: Reviews) => {
+  let scoreArr = reviews.map((dataList: Review) => {
     return dataList.evaluation;
   });
 
@@ -62,12 +76,28 @@ export default function Review({
     rate = 0;
   }
 
-  const handleClick = (number: number) => {
-    setNum(number);
+  // ページネーション機能
+  // １ページにつき表示する件数
+  const itemPerPage = 5;
+
+  // ページの終わりの番号
+  const endOffset = itemOffset + itemPerPage;
+
+  const currentReviews = reviews.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(total / itemPerPage);
+
+  // 余りが選択されたページ番号の1番目番号になる
+  const handleClick = (i: number) => {
+    let num = i - 1;
+    const newOffset = (num * itemPerPage) % total;
+    setItemOffSet(newOffset);
   };
 
+  // 動的APIルーティングの値を変更
   const selectChange = (value: string) => {
-    setSort(value);
+    const result = value.split(',');
+    setOrderBy(result[0]);
+    setOrder(result[1]);
   };
 
   return (
@@ -80,26 +110,26 @@ export default function Review({
         </p>
         <div className={styles.accordionOuter}>
           <ReviewSelect selectChange={selectChange} />
-          {reviews.map((review: Reviews) => {
+          {currentReviews.map((review: Review) => {
             return (
-              <div key={review.id} className={styles.accordion}>
+              <div key={review.reviewId} className={styles.accordion}>
                 <input
                   type="checkbox"
                   className={styles.toggle}
-                  id={String(review.id)}
+                  id={String(review.reviewId)}
                 />
                 <label
                   className={styles.label}
-                  htmlFor={String(review.id)}
+                  htmlFor={String(review.reviewId)}
                 >
-                  {review.reviewName}
-
+                  {review.reviewTitle}
                   {review.spoiler && (
                     <span className={styles.tag}>ネタバレあり </span>
                   )}
                 </label>
                 <div className={styles.contentBody}>
-                  <p>投稿者名：{review.userName}</p>
+                  {/* <p>投稿者名：{review.}</p> */}
+                  {/* userNameはどう取得する？ */}
                   <p>投稿日：{review.postTime}</p>
                   <p>点数：{review.evaluation}点</p>
                   <p>{review.reviewText}</p>
@@ -109,12 +139,25 @@ export default function Review({
           })}
         </div>
       </section>
-      {/* <Pagination
-        totalCount={total}
-        pageSize={5}
-        onClick={handleClick}
-        currentPage={0}
-      /> */}
+      {(function () {
+        const list = [];
+        for (let i = 1; i <= pageCount; i++) {
+          list.push(
+            <button
+              key={i}
+              className={styles.pagingBtn}
+              onClick={() => handleClick(i)}
+            >
+              {i}
+            </button>
+          );
+        }
+        return (
+          <div className={`${styles.paging} ${styles.taLeft}`}>
+            {list}
+          </div>
+        );
+      })()}
       <style jsx>
         {`
           p {

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Item } from 'types/item';
 import { RentalHistory } from 'types/user';
 import styles from 'styles/detail.module.css';
@@ -9,7 +9,6 @@ import Header from '../../components/Header';
 import Head from 'next/head';
 import Player from '../../components/Player';
 import loadStyles from 'styles/loading.module.css';
-import { config } from '../../config/index';
 import Review from '../../components/Review';
 import ReviewBtn from 'components/ReviewBtn';
 import prisma from '../../../lib/prisma';
@@ -60,24 +59,31 @@ export async function getStaticProps({
   };
 }
 
-export default function ItemDetail({
-  item,
-  total,
-}: {
-  item: Item;
-  total: number;
-}) {
+export default function ItemDetail({ item }: { item: Item }) {
   const [price, setPrice] = useState(0);
   const [period, setPeriod] = useState(0);
   const [isChoiced, setIsChoiced] = useState(false);
   const [start, setStart] = useState(false);
   const [startId, setStartId] = useState(0);
+  const [rental, setRental] = useState<RentalHistory[]>([]);
 
   const startPlayer = (id: number) => {
     setStart(!start);
     setStartId(id);
   };
+
   const { data } = UseSWR<SessionUser>('/api/getUser', fetcher);
+
+  const userId = data?.userId;
+  useEffect(() => {
+    fetch(`/api/selectRental/${userId}`)
+      .then((res) => res.json())
+      .then((result) => {
+        setRental(result.rental);
+      });
+  }, [userId]);
+
+  const isLoggedIn = data?.isLoggedIn;
 
   if (!data)
     return (
@@ -94,21 +100,17 @@ export default function ItemDetail({
       </div>
     );
 
-  // ログイン状態のカート
   let carts = data.userCarts;
-
-  // ログイン前のカート
-  let rentalHistory: RentalHistory[] | undefined =
-    data.userRentalHistories;
-  let rentalFlg = false;
   let cartflg = false;
   let rentalPeriod;
   let rentalCartId: number;
-  let nowDate = new Date();
   let isRentaled = false;
+  let rentalFlg;
   let rentalStart;
   let rentalEnd;
   let startFlg;
+  let nowDate = new Date();
+  let rentalHistory: RentalHistory[] = rental;
 
   let rentaledItems = rentalHistory?.filter((rentaledItem) => {
     return rentaledItem.itemId === item.itemId;
@@ -131,11 +133,19 @@ export default function ItemDetail({
       rentalCartId = lastItem.rentalHistoryId;
       rentalPeriod = '未再生';
     } else if (lastItem.rentalStart && lastItem.rentalEnd) {
-      rentalFlg = true;
       startFlg = true;
       rentalStart = new Date(lastItem.rentalStart);
       rentalEnd = new Date(lastItem.rentalEnd);
+      if (rentalEnd > nowDate) {
+        rentalFlg = true;
+      }
     }
+  }
+
+  // ログアウトした際に再生ボタンの非表示
+  if (!isLoggedIn) {
+    rentalFlg = false;
+    mutate('api/getUser');
   }
 
   let cartId: number;
@@ -188,7 +198,6 @@ export default function ItemDetail({
           if (isChoiced === true) {
             setIsChoiced(!isChoiced);
           }
-          console.log(result.isAdd);
           if (result.isAdd === true) {
             cartflg = true;
             mutate('/api/getUser');
@@ -323,7 +332,6 @@ export default function ItemDetail({
                       ) : (
                         <p>視聴期間：{rentalPeriod}</p>
                       )}
-
                       <button
                         className={`${styles.btn} ${styles.pushdown}`}
                         onClick={() => startPlayer(rentalCartId)}
@@ -410,14 +418,15 @@ export default function ItemDetail({
         <section className={styles.review}>
           <div className={styles.listWrpper}>
             <div className={styles.listInner}>
-              <Review itemId={item.itemId} total={total} />
+              <Review itemId={item.itemId} />
             </div>
             <div className={styles.tac}>
-              {/* <ReviewBtn
+              <ReviewBtn
                 userId={userId}
                 id={item.itemId}
                 isRentaled={isRentaled}
-              /> */}
+                isLoggedIn={isLoggedIn}
+              />
             </div>
           </div>
         </section>

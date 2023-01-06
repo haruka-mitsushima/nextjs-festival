@@ -24,7 +24,6 @@ export default withIronSessionApiRoute(async (req, res) => {
   } catch {
     console.log('エラー');
   }
-  // res.status(200).end();
   res.json({
     cart: req.session.cart,
   });

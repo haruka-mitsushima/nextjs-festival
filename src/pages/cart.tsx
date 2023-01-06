@@ -4,18 +4,16 @@ import { UserCart } from 'types/user';
 import styles from 'styles/cart.module.css';
 import DeleteBtn from '../components/DeleteItem';
 import UseSWR, { mutate } from 'swr';
-import { SessionUser } from '../pages/api/getUser';
 import Header from '../components/Header';
 import Head from 'next/head';
 import loadStyles from 'styles/loading.module.css';
 import { Item } from 'types/item';
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
-import { redirect } from 'next/dist/server/api-utils';
 import { GetServerSideProps } from 'next';
 import { SessionUserCart } from 'types/session';
 import { SelectCart } from './api/preRendering/PreCart';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -56,6 +54,18 @@ export const getServerSideProps: GetServerSideProps =
 export default function CartList({ cart }: { cart: UserCart[] }) {
   const [cartItem, setCartItem] = useState(cart);
   const { data } = UseSWR('/api/getSessionInfo', fetcher);
+
+  const isLoggedIn = data?.isLoggedIn;
+
+  // ユーザーのカート情報を取得
+  let carts = data?.userCarts;
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setCartItem(carts);
+    }
+  }, [isLoggedIn, carts]);
+
   if (!data)
     return (
       <div className={loadStyles.loadingArea}>
@@ -73,8 +83,6 @@ export default function CartList({ cart }: { cart: UserCart[] }) {
 
   // ユーザーのidを取得予定
   const id = data.userId;
-  // ユーザーのカート情報を取得
-  let carts = data.userCarts;
 
   let isCartflg = true;
   if (!cartItem?.length) {
