@@ -18,20 +18,23 @@ export default function Top({
   newItems,
   genreItems,
   useChatbot,
-  userName
+  userName,
 }: {
   newItems: Array<Item>;
   genreItems: Array<Item>;
   useChatbot: boolean;
-  userName: string
+  userName: string;
 }) {
-  let [doLogout, setLogout] = useState(false)
+  let [doLogout, setLogout] = useState(false);
   const logout = () => {
-    setLogout(true)
-    mutate('/api/getSessionInfo')
-  }
+    setLogout(true);
+    mutate('/api/getSessionInfo');
+  };
 
-  const { data } = UseSWR<SessionUser>('/api/getSessionInfo', fetcher);
+  const { data } = UseSWR<SessionUser>(
+    '/api/getSessionInfo',
+    fetcher
+  );
   if (!data)
     return (
       <div className={loadStyles.loadingArea}>
@@ -57,48 +60,66 @@ export default function Top({
         dologout={() => logout()}
       />
       <ItemList items={newItems} />
-      <RecommendItemList items={genreItems} user={data} useChatbot={useChatbot} doLogout={doLogout} userName={userName} />
+      <RecommendItemList
+        items={genreItems}
+        user={data}
+        useChatbot={useChatbot}
+        doLogout={doLogout}
+        userName={userName}
+      />
     </>
   );
 }
 
-export const getServerSideProps = withIronSessionSsr(async ({ req }) => {
-  const take = 10;
-  // ユーザー情報の取得
-  let user: SessionUser = {
-    isLoggedIn: false,
-  };
-  let favoriteId = 3
-  let userName = 'guest'
-  let useChatbot = false;
-  // ログインしている場合、favoriteIdを取得する
-  if (req.session.user) {
-    const result = await prisma.user.findUnique({
-      where: {
-        userId: req.session.user.userId,
+export const getServerSideProps = withIronSessionSsr(
+  async ({ req }) => {
+    const take = 10;
+    // ユーザー情報の取得
+    let user: SessionUser = {
+      isLoggedIn: false,
+    };
+    let favoriteId = 3;
+    let userName = 'guest';
+    let useChatbot = false;
+    // ログインしている場合、favoriteIdを取得する
+    if (req.session.user) {
+      const body = { userId: req.session.user.userId };
+      const url = 'http://localhost:3005/api/user';
+      const params = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      };
+      const response = await fetch(url, params);
+      const data = await response.json();
+      // const result = await prisma.user.findUnique({
+      //   where: {
+      //     userId: req.session.user.userId,
+      //   }
+      // });
+      if (data?.favoriteId) {
+        favoriteId = data.favoriteId;
+        useChatbot = true;
       }
-    });
-    if (result?.favoriteId) {
-      favoriteId = result.favoriteId
-      useChatbot = true;
+      if (data?.userName) {
+        userName = data.userName;
+      }
+      user.userId = req.session.user.userId;
+      user.isLoggedIn = true;
     }
-    if (result?.userName) {
-      userName = result.userName
-    }
-    user.userId = req.session.user.userId;
-    user.isLoggedIn = true;
-  };
 
-  // 作品情報取得
-  const { newItems, genreItems } = await PreTop(take, favoriteId);
+    // 作品情報取得
+    const { newItems, genreItems } = await PreTop(take, favoriteId);
 
-  return {
-    props: {
-      newItems,
-      genreItems,
-      favoriteId,
-      useChatbot,
-      userName
-    },
-  };
-}, ironOptions)
+    return {
+      props: {
+        newItems,
+        genreItems,
+        favoriteId,
+        useChatbot,
+        userName,
+      },
+    };
+  },
+  ironOptions
+);
