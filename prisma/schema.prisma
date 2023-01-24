@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,115 +7,106 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ユーザ情報
-model User {
-  userId Int @id @default(autoincrement())
-  userName String 
-  zipcode String
-  prefecture String
-  city String
-  houseNumber String
-  building String?
-  familyName String
-  firstName String
-  familyNameKana String
-  firstNameKana String
-  mailAddress String
-  password String
-  favoriteId Int?
-  category Category? @relation(fields: [favoriteId], references: [categoryId])
-  rentalHistories RentalHistory[]
-  carts Cart[]
-}
-
-// 作品情報
-model Item{
-  itemId Int @id @default(autoincrement())
-  fesName String
-  artist String
-  itemDetail String
-  itemImage String
-  releaseDate DateTime
-  playTime Int
-  twoDaysPrice Int
-  sevenDaysPrice Int
-  categories Int[]
-  keywords String[]
-  reviews Review[]
-  carts Cart[]
-}
-
-// ジャンル情報
-model Category{
-  categoryId Int @id @default(autoincrement()) 
-  categoryName String
-  user User[]
-  chatbotAnswer ChatbotAnswer[]
-}
-
-// レビュー情報
-model Review{
-  reviewId Int @id @default(autoincrement()) 
-  itemId Int
-  userId Int
-  postTime String
-  reviewTitle String
-  reviewText String
-  evaluation Int
-  spoiler Boolean
-  item Item @relation(fields: [itemId], references: [itemId])
-}
-
-// レンタル履歴
-model RentalHistory{
-  rentalHistoryId Int @id @default(autoincrement())
-  userId Int
-  itemId Int
-  itemName String
-  price Int
-  itemImage String
+model Cart {
+  cartId       Int  @id @default(autoincrement())
+  userId       Int
   rentalPeriod Int
-  payDate DateTime
-  rentalStart DateTime?
-  rentalEnd DateTime?
-  users User @relation(fields: [userId], references: [userId])
+  itemId       Int
+  Item         Item @relation(fields: [itemId], references: [itemId])
+  User         User @relation(fields: [userId], references: [userId])
 }
 
-// カート情報
-model Cart{
-  cartId Int @id @default(autoincrement())
-  userId Int
-  rentalPeriod Int
-  itemId Int
-  users User @relation(fields: [userId], references: [userId])
-  items Item @relation(fields: [itemId], references: [itemId])
+model Category {
+  categoryId    Int             @id @default(autoincrement())
+  categoryName  String
+  ChatbotAnswer ChatbotAnswer[]
+  User          User[]
 }
 
-// チャットボットシナリオ情報
-model Chatbot{
-  chatbotId Int @id @default(autoincrement())
-  text String?
-  continue Boolean
-  option String
-  chatbotChoice ChatbotChoice[]
+model Chatbot {
+  chatbotId     Int             @id @default(autoincrement())
+  text          String?
+  continue      Boolean
+  option        String
+  ChatbotChoice ChatbotChoice[]
 }
 
-// チャットボット選択肢情報
-model ChatbotChoice{
-  chatbotChoiceId Int @default(autoincrement())
-  chatbotId Int 
-  text String
-  Chatbot Chatbot @relation(fields: [chatbotId], references: [chatbotId])
-
-  @@unique([chatbotChoiceId,chatbotId])
-}
-
-// チャットボット回答情報
-model ChatbotAnswer{
-  question1 Int 
-  question2 Int 
+model ChatbotAnswer {
+  question1  Int
+  question2  Int
   categoryId Int
-  category Category @relation(fields: [categoryId], references: [categoryId])
+  Category   Category @relation(fields: [categoryId], references: [categoryId])
 
-  @@unique([question1,question2])
+  @@unique([question1, question2])
+}
+
+model ChatbotChoice {
+  chatbotChoiceId Int     @default(autoincrement())
+  chatbotId       Int
+  text            String
+  Chatbot         Chatbot @relation(fields: [chatbotId], references: [chatbotId])
+
+  @@unique([chatbotChoiceId, chatbotId])
+}
+
+model Item {
+  itemId         Int      @id @default(autoincrement())
+  fesName        String
+  artist         String
+  itemDetail     String
+  itemImage      String
+  releaseDate    DateTime
+  playTime       Int
+  twoDaysPrice   Int
+  sevenDaysPrice Int
+  categories     Int[]
+  keywords       String[]
+  Cart           Cart[]
+  Review         Review[]
+}
+
+model RentalHistory {
+  rentalHistoryId Int       @id @default(autoincrement())
+  userId          Int
+  itemId          Int
+  itemName        String
+  price           Int
+  itemImage       String
+  rentalPeriod    Int
+  payDate         DateTime
+  rentalStart     DateTime?
+  rentalEnd       DateTime?
+  User            User      @relation(fields: [userId], references: [userId])
+}
+
+model Review {
+  reviewId    Int     @id @default(autoincrement())
+  itemId      Int
+  userId      Int
+  postTime    String
+  reviewTitle String
+  reviewText  String
+  evaluation  Int
+  spoiler     Boolean
+  Item        Item    @relation(fields: [itemId], references: [itemId])
+}
+
+model User {
+  userId         Int             @id @default(autoincrement())
+  userName       String
+  zipcode        String
+  prefecture     String
+  city           String
+  houseNumber    String
+  building       String?
+  familyName     String
+  firstName      String
+  familyNameKana String
+  firstNameKana  String
+  mailAddress    String
+  password       String
+  favoriteId     Int?
+  Cart           Cart[]
+  RentalHistory  RentalHistory[]
+  Category       Category?       @relation(fields: [favoriteId], references: [categoryId])
 }
