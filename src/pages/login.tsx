@@ -29,7 +29,9 @@ export default function Home() {
       },
     }).then(async (res) => {
       if (res.status === 200) {
-        await fetch('/api/addLogedinCart').then((res) => router.push('/'));
+        await fetch('/api/addLogedinCart').then(() =>
+          router.push('/')
+        );
       } else {
         setErrorMessage(
           '※メールアドレスまたはパスワードが間違っています'
@@ -43,7 +45,11 @@ export default function Home() {
       <Head>
         <title>ログイン</title>
       </Head>
-      <Header isLoggedIn={false} dologout={() => false} login={true} />
+      <Header
+        isLoggedIn={false}
+        dologout={() => false}
+        login={true}
+      />
       <main className={styles.loginMain}>
         <section className={styles.formWrapper}>
           <h1>
@@ -79,7 +85,9 @@ export default function Home() {
               </li>
             </ul>
             <p className={styles.erroMessage}>{errorMessage}</p>
-            <button type="submit" className={styles.loginBtn}>ログイン</button>
+            <button type="submit" className={styles.loginBtn}>
+              ログイン
+            </button>
           </form>
         </section>
       </main>
