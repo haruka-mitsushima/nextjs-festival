@@ -7,10 +7,8 @@ import RecommendItemList from 'components/RecommendItemList';
 import loadStyles from 'styles/loading.module.css';
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
-import prisma from '../../lib/prisma';
 import { useState } from 'react';
 import { SessionUser } from './api/getSessionInfo';
-import PreTop from './api/preRendering/PreTop';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -92,11 +90,6 @@ export const getServerSideProps = withIronSessionSsr(
       };
       const response = await fetch(url, params);
       const data = await response.json();
-      // const result = await prisma.user.findUnique({
-      //   where: {
-      //     userId: req.session.user.userId,
-      //   }
-      // });
       if (data?.favoriteId) {
         favoriteId = data.favoriteId;
         useChatbot = true;
@@ -109,7 +102,15 @@ export const getServerSideProps = withIronSessionSsr(
     }
 
     // 作品情報取得
-    const { newItems, genreItems } = await PreTop(take, favoriteId);
+    const body = { favoriteId };
+    const url = 'http://localhost:3005/api/item/preTop';
+    const params = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    };
+    const response = await fetch(url, params);
+    const { newItems, genreItems } = await response.json();
 
     return {
       props: {

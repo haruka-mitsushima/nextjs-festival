@@ -5,7 +5,6 @@ import styleHeader from 'styles/header.module.css';
 import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
-import { config } from '../config/index';
 
 type Errors = {
   userName: string;
@@ -58,9 +57,6 @@ export default function LoginScreen() {
     password: '',
     passwordTest: '',
   });
-  const rentalHistories: [] = []; ///レンタル履歴
-  const userCarts: [] = []; //カートの中身
-  const favoriteGenre: number = 0; //お気に入りジャンル
   const router = useRouter(); //登録された情報を更新した状態でページを移動
 
   //住所を検索
@@ -110,16 +106,19 @@ export default function LoginScreen() {
     e.preventDefault();
     const error: Errors = validate(formValues);
     // 登録済みのメールアドレスを確認する
-    const res = await fetch('/api/mailConditions', {
-      //Jsonファイルに送る
-      method: 'POST',
-      body: JSON.stringify({
-        formValues,
-      }),
-      headers: {
-        'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
-      },
-    });
+    const res = await fetch(
+      'http://localhost:3005/api/user/mailConditions',
+      {
+        //Jsonファイルに送る
+        method: 'POST',
+        body: JSON.stringify({
+          mailAddress: formValues.mailAddress,
+        }),
+        headers: {
+          'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
+        },
+      }
+    );
     const data = await res.json();
     if (!data.result) {
       error.mailAddress = data.message;
@@ -157,33 +156,31 @@ export default function LoginScreen() {
       error.passwordTest === ''
     ) {
       // 登録内容を登録する
-      const response = await fetch(config.users, {
-        //Jsonファイルに送る
+      const url = 'http://localhost:3005/api/user/signup';
+      const data = {
+        //Jsonデータに保存する内容を記載
+        userName: formValues.userName,
+        zipcode: formValues.zipcode,
+        prefecture: formValues.prefectures,
+        city: formValues.city,
+        houseNumber: formValues.houseNumber,
+        building: formValues.buildingName,
+        familyName: formValues.familyName,
+        firstName: formValues.firstName,
+        familyNameKana: formValues.familyNameKana,
+        firstNameKana: formValues.firstNameKana,
+        mailAddress: formValues.mailAddress,
+        password: formValues.password,
+      };
+      const params = {
         method: 'POST',
-        body: JSON.stringify({
-          //Jsonデータに保存する内容を記載
-          userName: formValues.userName,
-          zipcode: formValues.zipcode,
-          prefectures: formValues.prefectures,
-          city: formValues.city,
-          houseNumber: formValues.houseNumber,
-          buildingName: formValues.buildingName,
-          familyName: formValues.familyName,
-          firstName: formValues.firstName,
-          familyNameKana: formValues.familyNameKana,
-          firstNameKana: formValues.firstNameKana,
-          mailAddress: formValues.mailAddress,
-          password: formValues.password,
-          rentalHistories,
-          userCarts,
-          favoriteGenre,
-        }),
-        headers: {
-          'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
-        },
-      }).then(() => {
-        router.push('/registerComp'); //e.preventDefault()を行なった為、クライアント側の遷移処理をここで行う
-      });
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      };
+      console.log(params.body);
+      const response = await fetch(url, params);
+      const result = await response.json();
+      if (result.message === 'ok') await router.push('/registerComp');
     } else {
       router.push('/register');
     }
