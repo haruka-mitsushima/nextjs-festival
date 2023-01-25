@@ -27,13 +27,13 @@ export default function RecommendItemList({
     const id = 3;
     const take = 10;
     const { data } = UseSWR<Array<Item>>(
-      `/api/selectGenre/${id}/${take}`,
+      `http://localhost:3005/api/item/favorite/${id}`,
       fetcher
     );
     if (data) {
       logItems.push(...data);
     }
-    console.log(`data: ${data}`)
+    console.log(`data: ${data}`);
   }
 
   const route = () => {
@@ -58,7 +58,38 @@ export default function RecommendItemList({
       ) : (
         <div className={styles.p}>邦楽ロック</div>
       )}
-      {logItems.length > 1 ? (
+      {user.isLoggedIn ? (
+        useChatbot ? (
+          <section className={styles.itemList}>
+            {logItems.map((item) => {
+              return (
+                <Link
+                  key={item.itemId}
+                  href={`/items/${item.itemId}`}
+                  className={styles.item}
+                >
+                  <Image
+                    src={item.itemImage}
+                    width={400}
+                    height={225}
+                    alt={item.artist}
+                    className={styles.itemImage}
+                    priority
+                  />
+                  <div className={styles.detail}>
+                    <div className={styles.artist}>{item.artist}</div>
+                    <div className={styles.fesName}>
+                      {item.fesName}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </section>
+        ) : (
+          <div></div>
+        )
+      ) : logItems.length > 1 ? (
         <section className={styles.itemList}>
           {logItems.map((item) => {
             return (
