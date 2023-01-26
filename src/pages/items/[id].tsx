@@ -76,7 +76,9 @@ export default function ItemDetail({ item }: { item: Item }) {
 
   const userId = data?.userId;
   useEffect(() => {
-    fetch(`/api/selectRental/${userId}`)
+    fetch(
+      `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`
+    )
       .then((res) => res.json())
       .then((result) => {
         setRental(result.rental);
