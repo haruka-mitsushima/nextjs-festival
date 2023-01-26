@@ -187,12 +187,14 @@ export default function ItemDetail({ item }: { item: Item }) {
     }
 
     // ユーザーidの取得
-    const id = data.userId;
+    const userId = data.userId;
     const itemId = item.itemId;
 
     // ログイン後
-    if (id !== undefined) {
-      await fetch(`/api/addCart/${id}/${itemId}/${period}`)
+    if (userId !== undefined) {
+      await fetch(
+        `http://localhost:3005/api/cart/addCart/${userId}/${itemId}/${period}`
+      )
         .then((res) => res.json())
         .then((result) => {
           if (isChoiced === true) {
@@ -252,7 +254,9 @@ export default function ItemDetail({ item }: { item: Item }) {
     const id = data.userId;
     // ログイン後の場合
     if (id !== undefined) {
-      await fetch(`/api/deleteCart/${cartId}`);
+      await fetch(
+        `http://localhost:3005/api/cart/deleteCart/${cartId}`
+      );
       mutate('/api/getUser');
     } else {
       // ログイン前の場合
