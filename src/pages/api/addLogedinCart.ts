@@ -1,7 +1,6 @@
 import { withIronSessionApiRoute } from 'iron-session/next';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ironOptions } from '../../../lib/ironOprion';
-import prisma from '../../../lib/prisma';
 
 export default withIronSessionApiRoute(addLogedinCart, ironOptions);
 
