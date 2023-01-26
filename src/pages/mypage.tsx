@@ -13,7 +13,6 @@ import router from 'next/router';
 import Countdown from '../components/Countdown';
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
-import prisma from '../../lib/prisma';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -237,12 +236,17 @@ export default function Mypage({
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
-    const rentalHistories: RentalHistory[] =
-      await prisma.rentalHistory.findMany({
-        where: {
-          userId: req.session.user?.userId,
-        },
-      });
+    const userId = req.session.user?.userId;
+    const url = `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    const rentalHistories: RentalHistory[] = data.rental;
+    // const rentalHistories: RentalHistory[] =
+    //   await prisma.rentalHistory.findMany({
+    //     where: {
+    //       userId: req.session.user?.userId,
+    //     },
+    //   });
 
     rentalHistories.map((item) => {
       const tmp = item;
