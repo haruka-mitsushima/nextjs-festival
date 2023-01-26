@@ -12,7 +12,6 @@ import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
 import { GetServerSideProps } from 'next';
 import { SessionUserCart } from 'types/session';
-import { SelectCart } from './api/preRendering/PreCart';
 import { useEffect, useState } from 'react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -23,8 +22,11 @@ export const getServerSideProps: GetServerSideProps =
     let userId = req.session.user?.userId;
     if (userId) {
       // ログイン後
-      const res = await SelectCart(userId);
-      if (!res.cart) {
+      const url = `http://localhost:3005/api/user/selectCart/${userId}`;
+      const response = await fetch(url);
+      const res = await response.json();
+      // const res = await SelectCart(userId);
+      if (res.errorFlg) {
         return {
           redirect: {
             permanent: false,

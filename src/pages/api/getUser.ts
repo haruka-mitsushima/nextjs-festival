@@ -1,8 +1,7 @@
 import { withIronSessionApiRoute } from 'iron-session/next';
 import { ironOptions } from '../../../lib/ironOprion';
 import { NextApiRequest, NextApiResponse } from 'next';
-import {  UserCart, RentalHistory } from '../../types/user';
-import prisma from '../../../lib/prisma';
+import { UserCart, RentalHistory } from '../../types/user';
 
 export default withIronSessionApiRoute(getUserRoute, ironOptions);
 
@@ -21,22 +20,25 @@ async function getUserRoute(
 ) {
   if (req.session.user) {
     const userId = req.session.user.userId;
-    const result = await prisma.user.findUnique({
-      where: {
-        userId: userId,
-      },
-      select: {
-        carts: {
-          include: {
-            items: true,
-          },
-        },
-      },
-    });
+    const url = `http://localhost:3005/api/user/selectCart/${userId}`;
+    const response = await fetch(url);
+    const result = await response.json();
+    // const result = await prisma.user.findUnique({
+    //   where: {
+    //     userId: userId,
+    //   },
+    //   select: {
+    //     Cart: {
+    //       include: {
+    //         Item: true,
+    //       },
+    //     },
+    //   },
+    // });
     res.json({
       userId: userId,
       isLoggedIn: true,
-      userCarts: result?.carts,
+      userCarts: result?.cart,
     });
   } else {
     const sessionCart = req.session.cart;

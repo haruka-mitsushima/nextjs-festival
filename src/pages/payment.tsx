@@ -10,7 +10,6 @@ import Header from '../components/Header';
 import { SessionUser } from 'pages/api/getSessionInfo';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { SelectCart } from './api/preRendering/PreCart';
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
@@ -25,7 +24,10 @@ export const getServerSideProps: GetServerSideProps =
     // ログインしている場合、カート情報を取得する
     if (req.session.user) {
       user.userId = req.session.user.userId;
-      const res = await SelectCart(user.userId);
+      const url = `http://localhost:3005/api/user/selectCart/${user.userId}`;
+      const response = await fetch(url);
+      const res = await response.json();
+      // const res = await SelectCart(user.userId);
       user.userCarts = res.cart;
       user.isLoggedIn = true;
     }
@@ -59,15 +61,20 @@ export default function Payment({
     router.push(`/`);
   }
   // 合計金額
-  const sum = user.userCarts?.map((item) => {
-    let price = 0;
-    if (item.rentalPeriod === 2) {
-      price = item.items.twoDaysPrice;
-    } else {
-      price = item.items.sevenDaysPrice
-    }
-    return price;
-  }).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+  const sum = user.userCarts
+    ?.map((item) => {
+      let price = 0;
+      if (item.rentalPeriod === 2) {
+        price = item.items.twoDaysPrice;
+      } else {
+        price = item.items.sevenDaysPrice;
+      }
+      return price;
+    })
+    .reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0
+    );
 
   return (
     <>
@@ -99,6 +106,7 @@ export default function Payment({
                     width={200}
                     height={112}
                     alt={'商品画像のURL'}
+                    priority
                   />
                   <div className={styles.itemName}>
                     <p>{`${item.items.artist}  ${item.items.fesName}`}</p>
@@ -108,13 +116,9 @@ export default function Payment({
                 <div className={styles.price}>
                   <p>価格</p>
                   {item.rentalPeriod === 2 ? (
-                    <div>
-                      {item.items.twoDaysPrice}円
-                    </div>
+                    <div>{item.items.twoDaysPrice}円</div>
                   ) : (
-                    <div>
-                      {item.items.sevenDaysPrice}円
-                    </div>
+                    <div>{item.items.sevenDaysPrice}円</div>
                   )}
                 </div>
               </div>
