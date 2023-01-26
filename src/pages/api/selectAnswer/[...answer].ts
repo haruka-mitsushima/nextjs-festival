@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Item } from "types/item";
 import prisma from '../../../../lib/prisma';
 
-export default async function selectGenre(req: NextApiRequest, res: NextApiResponse<object>) {
+export default async function selectAnswer(req: NextApiRequest, res: NextApiResponse<object>) {
     let feeling = 0;
     let who = 0;
     const { answer } = req.query;
@@ -12,7 +12,7 @@ export default async function selectGenre(req: NextApiRequest, res: NextApiRespo
     };
     const response = await prisma.chatbotAnswer.findUnique({
         where: {
-            question1_question2:{
+            question1_question2: {
                 question1: feeling,
                 question2: who
             }
