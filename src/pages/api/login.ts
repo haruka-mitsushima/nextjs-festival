@@ -3,7 +3,7 @@ import { ironOptions } from "../../../lib/ironOprion"
 
 export default withIronSessionApiRoute(
   async function loginRoute(req, res) {
-    const body = { mailAddress: req.body.mailAddress, password: req.body.password };
+    const body = { ...req.body };
     const url = 'http://localhost:3005/api/user/login';
     const params = {
       method: 'POST',

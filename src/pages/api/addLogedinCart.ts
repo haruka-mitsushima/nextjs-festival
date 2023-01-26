@@ -21,12 +21,23 @@ async function addLogedinCart(req: NextApiRequest, res: NextApiResponse) {
             }
             return data;
         })
-        // cartテーブルに追加
-        await prisma.cart.createMany({
-            data: sessionCart
-        })
+
+        const body = { sessionCart };
+        const url = 'http://localhost:3005/api/cart/addLogedinCart';
+        const params = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+        await fetch(url, params).then(() => { req.session.cart = []; })
+
+        // // cartテーブルに追加
+        // await prisma.cart.createMany({
+        //     data: sessionCart
+        // })
+
         // sessionのカートを空にする
-        req.session.cart = [];
+        // req.session.cart = [];
     }
     res.redirect('/')
 }
