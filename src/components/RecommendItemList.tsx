@@ -61,7 +61,7 @@ export default function RecommendItemList({
       {user.isLoggedIn ? (
         useChatbot ? (
           <section className={styles.itemList}>
-            {logItems.map((item) => {
+            {items.map((item) => {
               return (
                 <Link
                   key={item.itemId}
