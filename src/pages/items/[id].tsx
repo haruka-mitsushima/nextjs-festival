@@ -73,7 +73,11 @@ export default function ItemDetail({ item }: { item: Item }) {
 
   const { data } = UseSWR<SessionUser>('/api/getUser', fetcher);
 
-  const userId = data?.userId;
+  let userId = 0;
+  if (data?.userId) {
+    userId = data.userId;
+  }
+
   useEffect(() => {
     fetch(
       `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`

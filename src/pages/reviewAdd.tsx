@@ -8,25 +8,23 @@ import { Item } from 'types/item';
 import ReviewForm from '../components/ReviewForm';
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
-import prisma from '../../lib/prisma';
 import UseSWR, { mutate } from 'swr';
 import { SessionUser } from './api/getSessionInfo';
 import Header from '../components/Header';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function Review({
-  item,
-}: {
-  item: Item;
-}) {
-  let [doLogout, setLogout] = useState(false)
+export default function Review({ item }: { item: Item }) {
+  let [doLogout, setLogout] = useState(false);
   const [formReviewTitle, setFormReviewTitle] = useState('');
   const [formReviewText, setFormReviewText] = useState('');
   const [formEvaluation, setFormEvaluation] = useState(0);
   const [formSpoiler, setFormSpoiler] = useState(false);
 
-  const { data } = UseSWR<SessionUser>('/api/getSessionInfo', fetcher);
+  const { data } = UseSWR<SessionUser>(
+    '/api/getSessionInfo',
+    fetcher
+  );
 
   if (!data)
     return (
@@ -69,7 +67,7 @@ export default function Review({
       spoiler: formSpoiler,
     };
 
-    await fetch('/api/addReview', {
+    await fetch('http://localhost:3005/api/review/createReview', {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {
@@ -81,9 +79,9 @@ export default function Review({
   };
 
   const logout = () => {
-    setLogout(true)
-    mutate('/api/getSessionInfo')
-  }
+    setLogout(true);
+    mutate('/api/getSessionInfo');
+  };
 
   return (
     <>
@@ -99,7 +97,6 @@ export default function Review({
         dologout={() => logout()}
       />
 
-
       <div>
         <Image
           src={`${item.itemImage}`}
@@ -108,8 +105,7 @@ export default function Review({
           height={225}
         />
         <p>
-          {item.artist}
-          {item.fesName}
+          {item.artist}　{item.fesName}
         </p>
       </div>
       <main>
@@ -120,6 +116,7 @@ export default function Review({
             formReviewTitle={formReviewTitle}
             formReviewText={formReviewText}
             formEvaluation={formEvaluation}
+            formSpoiler={formSpoiler}
             setFormReviewTitle={setFormReviewTitle}
             setFormReviewText={setFormReviewText}
             setFormEvaluation={setFormEvaluation}
@@ -136,11 +133,9 @@ export default function Review({
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, query }) => {
-    const item = await prisma.item.findUnique({
-      where: {
-        itemId: Number(query.itemId),
-      },
-    });
+    const url = `http://localhost:3005/api/item/getItemById/${query.itemId}`;
+    const response = await fetch(url);
+    const item = await response.json();
     if (!req.session.user) {
       return {
         redirect: {

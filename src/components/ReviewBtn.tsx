@@ -18,7 +18,7 @@ export default function Review({
 }) {
   // ユーザーのレビュー情報を取得
   const { data } = useSWR(
-    `/api/selectUserReview/${userId}/${id}`,
+    `http://localhost:3005/api/review/getUserReview/${userId}/${id}`,
     fetcher
   );
 
@@ -37,11 +37,9 @@ export default function Review({
       </div>
     );
 
-  const rentals = data.result;
-
   //レビューされた商品の場合はフラグを変更
   let isReviewed = false;
-  if (rentals.length) {
+  if (data.isReviewed) {
     isReviewed = true;
   }
 
@@ -55,9 +53,7 @@ export default function Review({
       {isRentaled ? (
         <>
           {isReviewed ? (
-            <Link
-              href={`/reviewUpdate?reviewId=${rentals[0].reviewId}`}
-            >
+            <Link href={`/reviewUpdate?reviewId=${data.reviewId}`}>
               <button className={styles.btnReview}>編集する</button>
             </Link>
           ) : (

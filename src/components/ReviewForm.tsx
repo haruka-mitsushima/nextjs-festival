@@ -1,39 +1,38 @@
 import reviewStyles from 'styles/review.module.css';
 import { Item } from 'types/item';
-import {useRef,Dispatch,SetStateAction, MouseEvent} from 'react';
-
+import { useRef, Dispatch, SetStateAction, MouseEvent } from 'react';
 
 type Reviews = {
-  item?:Item;
-  formReviewTitle:string;
-  formReviewText:string;
-  formEvaluation:number;
-  setFormReviewTitle:Dispatch<SetStateAction<string>>;
-  setFormReviewText:Dispatch<SetStateAction<string>>;
-  setFormEvaluation:Dispatch<SetStateAction<number>>;
-  setFormSpoiler:Dispatch<SetStateAction<boolean>>;
+  item?: Item;
+  formReviewTitle: string;
+  formReviewText: string;
+  formEvaluation: number;
+  formSpoiler: boolean;
+  setFormReviewTitle: Dispatch<SetStateAction<string>>;
+  setFormReviewText: Dispatch<SetStateAction<string>>;
+  setFormEvaluation: Dispatch<SetStateAction<number>>;
+  setFormSpoiler: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function ReviewForm(props: Reviews) {
-
   const review = useRef<HTMLDivElement>(null);
 
   //星を押した時
   const handleClick = function (e: MouseEvent<HTMLSpanElement>) {
     props.setFormEvaluation(Number((e.target as Element).id));
- 
-     for (let i = 0; i < 5; i++) {
+
+    for (let i = 0; i < 5; i++) {
       review.current?.children[i].classList.remove(
-         `${reviewStyles.active}`
-       );
-     }
- 
-     for (let i = 0; i < Number((e.target as Element).id); i++) {
+        `${reviewStyles.active}`
+      );
+    }
+
+    for (let i = 0; i < Number((e.target as Element).id); i++) {
       review.current?.children[i].classList.add(
-         `${reviewStyles.active}`
-       );
-     }
-   };
+        `${reviewStyles.active}`
+      );
+    }
+  };
 
   return (
     <div>
@@ -41,35 +40,35 @@ export default function ReviewForm(props: Reviews) {
         <span
           className={reviewStyles.evaluation}
           id="1"
-          onClick={(e) =>handleClick(e)}
+          onClick={(e) => handleClick(e)}
         >
           ★
         </span>
         <span
           className={reviewStyles.evaluation}
           id="2"
-          onClick={(e) =>handleClick(e)}
+          onClick={(e) => handleClick(e)}
         >
           ★
         </span>
         <span
           className={reviewStyles.evaluation}
           id="3"
-          onClick={(e) =>handleClick(e)}
+          onClick={(e) => handleClick(e)}
         >
           ★
         </span>
         <span
           className={reviewStyles.evaluation}
           id="4"
-          onClick={(e) =>handleClick(e)}
+          onClick={(e) => handleClick(e)}
         >
           ★
         </span>
         <span
           className={reviewStyles.evaluation}
           id="5"
-          onClick={(e) =>handleClick(e)}
+          onClick={(e) => handleClick(e)}
         >
           ★
         </span>
