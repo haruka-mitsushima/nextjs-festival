@@ -92,7 +92,7 @@ export default function Search({
       </Head>
       <Header
         isLoggedIn={data?.isLoggedIn}
-        dologout={() => mutate('/api/getUser')}
+        dologout={() => mutate('/api/getSessionInfo')}
       />
       <main className={styles.container}>
         <SearchForm />
