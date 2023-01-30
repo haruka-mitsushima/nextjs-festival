@@ -1,11 +1,8 @@
 import styles from 'styles/review.module.css';
 import useSWR from 'swr';
 import loadStyles from 'styles/loading.module.css';
-import { Reviews } from 'types/review';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import ReviewSelect from './ReviewSort ';
-import Pagination from './Paging';
-import { NextApiRequest, NextApiResponse } from 'next';
 import { Item } from 'types/item';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
