@@ -7,10 +7,7 @@ export default withIronSessionApiRoute(getUserRoute, ironOptions);
 
 export type SessionUser = {
   userId?: number;
-  userName?: string;
   userCarts?: UserCart[];
-  userRentalHistories?: RentalHistory[];
-  favoriteGenre?: number;
   isLoggedIn: boolean;
 };
 
