@@ -11,13 +11,14 @@ import Player from '../../components/Player';
 import loadStyles from 'styles/loading.module.css';
 import Review from '../../components/Review';
 import ReviewBtn from 'components/ReviewBtn';
-import prisma from '../../../lib/prisma';
 import Countdown from '../../components/Countdown';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export async function getStaticPaths() {
-  const data = await prisma.item.findMany();
+  const url = 'http://localhost:3005/api/item/getAllItems';
+  const response = await fetch(url);
+  const data = await response.json();
   const paths = data.map((item: { itemId: number }) => {
     return {
       params: {
@@ -37,11 +38,9 @@ export async function getStaticProps({
   params: { id: string };
 }) {
   const id = parseInt(params.id);
-  const item: Item | null = await prisma.item.findUnique({
-    where: {
-      itemId: id,
-    },
-  });
+  const url = `http://localhost:3005/api/item/getItemById/${id}`;
+  const response = await fetch(url);
+  const item = await response.json();
   if (!item) {
     return {
       redirect: {
