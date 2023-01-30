@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
 import { Item } from 'types/item';
-import prisma from '../../lib/prisma';
 import UseSWR, { mutate } from 'swr';
 import { SessionUser } from './api/getSessionInfo';
 import Header from '../components/Header';
@@ -31,7 +30,6 @@ export default function ReviewEdit({
 }: {
   reviewItem: ReviewItem;
 }) {
-
   let [doLogout, setLogout] = useState(false);
   const [formReviewTitle, setFormReviewTitle] = useState(
     reviewItem.reviewTitle
@@ -43,8 +41,6 @@ export default function ReviewEdit({
     reviewItem.evaluation
   );
   const [formSpoiler, setFormSpoiler] = useState(reviewItem.spoiler);
-
-  const review = useRef<HTMLDivElement>(null);
 
   const { data } = UseSWR<SessionUser>(
     '/api/getSessionInfo',
@@ -83,24 +79,32 @@ export default function ReviewEdit({
     const nowPostTime = `${postTimeYear}/${postTimeMonth}/${postTimeDate} ${postTimeHours}:${postTimeMinutes}`;
 
     const body = {
-      reviewId: reviewItem.reviewId,
       postTime: nowPostTime,
-      // reviewTitle: formReviewTitle,
+      reviewTitle: formReviewTitle,
       reviewText: formReviewText,
       evaluation: formEvaluation,
       spoiler: formSpoiler,
     };
-
-    await fetch(`/api/updateReview`, {
+    const url = `http://localhost:3005/api/review/updateReviewById/${reviewItem.reviewId}`;
+    const params = {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-      headers: {
-        'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
-      },
-    }).then(() => {
-      router.push(`/items/${reviewItem.item.fesName}`);
-      //e.preventDefault()を行なった為、クライアント側の遷移処理をここで行う
+    };
+    await fetch(url, params).then(() => {
+      router.push(`/items/${reviewItem.item.itemId}`);
     });
+
+    // await fetch(`/api/updateReview`, {
+    //   method: 'POST',
+    //   body: JSON.stringify(body),
+    //   headers: {
+    //     'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
+    //   },
+    // }).then(() => {
+    //   router.push(`/items/${reviewItem.item.itemId}`);
+    //   //e.preventDefault()を行なった為、クライアント側の遷移処理をここで行う
+    // });
   };
 
   const logout = () => {
@@ -127,7 +131,9 @@ export default function ReviewEdit({
         height={225}
       />
       <div>
-        <p>{reviewItem?.item.fesName}</p>
+        <p>
+          {reviewItem?.item.artist}　{reviewItem?.item.fesName}
+        </p>
       </div>
       <main>
         <h2>レビュー</h2>
@@ -136,6 +142,7 @@ export default function ReviewEdit({
             formReviewTitle={formReviewTitle}
             formReviewText={formReviewText}
             formEvaluation={formEvaluation}
+            formSpoiler={formSpoiler}
             setFormReviewTitle={setFormReviewTitle}
             setFormReviewText={setFormReviewText}
             setFormEvaluation={setFormEvaluation}
@@ -150,25 +157,17 @@ export default function ReviewEdit({
   );
 }
 
-
 //編集前の商品情報表示
 export const getServerSideProps = withIronSessionSsr(
   async ({ query }) => {
-    const reviewItem = await prisma.review.findUnique({
-      where: {
-        reviewId: Number(query.reviewId),
-      },
-
-      include: {
-        item: true,
-      },
-    });
-
+    const reviewId = Number(query.reviewId);
+    const url = `http://localhost:3005/api/review/getReviewById/${reviewId}`;
+    const response = await fetch(url);
+    const reviewItem = await response.json();
     if (reviewItem?.item) {
       const tmp: Item = reviewItem?.item;
       tmp.releaseDate = String(reviewItem?.item.releaseDate);
     }
-
     return {
       props: {
         reviewItem,
