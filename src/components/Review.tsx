@@ -1,8 +1,8 @@
 import styles from 'styles/review.module.css';
-import useSWR, { mutate } from 'swr';
 import { useEffect, useState } from 'react';
 import ReviewSelect from './ReviewSort';
 import { Item } from 'types/item';
+import { User } from '@prisma/client';
 
 type Review = {
   reviewId: number;
@@ -14,6 +14,7 @@ type Review = {
   evaluation: number;
   spoiler: boolean;
   items: Item;
+  users: User;
 };
 
 export default function Review({ itemId }: { itemId: number }) {
@@ -109,8 +110,7 @@ export default function Review({ itemId }: { itemId: number }) {
                   )}
                 </label>
                 <div className={styles.contentBody}>
-                  {/* <p>投稿者名：{review.}</p> */}
-                  {/* userNameはどう取得する？ */}
+                  <p>投稿者名：{review.users.userName}</p>
                   <p>投稿日：{review.postTime}</p>
                   <p>点数：{review.evaluation}点</p>
                   <p>{review.reviewText}</p>
