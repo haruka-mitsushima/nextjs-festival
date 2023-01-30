@@ -55,7 +55,7 @@ export default function ChatbotPage({
       </Head>
       <Header
         isLoggedIn={data?.isLoggedIn}
-        dologout={() => mutate('/api/getUser')}
+        dologout={() => mutate('/api/getSessionInfo')}
       />
       <Chatbot chatList={chatList} userName={userName} data={data} />
     </>
