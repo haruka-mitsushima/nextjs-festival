@@ -33,7 +33,6 @@ export default function RecommendItemList({
     if (data) {
       logItems.push(...data);
     }
-    console.log(`data: ${data}`);
   }
 
   const route = () => {

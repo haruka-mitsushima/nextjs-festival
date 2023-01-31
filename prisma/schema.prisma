@@ -106,7 +106,7 @@ model User {
   firstNameKana  String
   mailAddress    String
   password       String
-  favoriteId     Int?            @default(0)
+  favoriteId     Int?
   Cart           Cart[]
   RentalHistory  RentalHistory[]
   Review         Review[]

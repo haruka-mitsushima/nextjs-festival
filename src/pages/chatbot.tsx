@@ -71,14 +71,13 @@ export const getServerSideProps = withIronSessionSsr(
 
     let userName = 'guest';
     // ログインしている場合、userNameを取得する
+
     if (req.session.user) {
-      const result = await prisma.user.findUnique({
-        where: {
-          userId: req.session.user.userId,
-        },
-      });
-      if (result?.userName) {
-        userName = result.userName;
+      const url = `http://localhost:3005/api/user/getUserName/${req.session.user.userId}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data) {
+        userName = data;
       }
     }
 

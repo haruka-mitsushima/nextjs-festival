@@ -177,7 +177,6 @@ export default function LoginScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       };
-      console.log(params.body);
       const response = await fetch(url, params);
       const result = await response.json();
       if (result.message === 'ok') await router.push('/registerComp');
