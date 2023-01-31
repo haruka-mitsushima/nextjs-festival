@@ -73,7 +73,7 @@ model RentalHistory {
   price           Int
   itemImage       String
   rentalPeriod    Int
-  payDate         DateTime
+  payDate         DateTime? @default(now())
   rentalStart     DateTime?
   rentalEnd       DateTime?
   User            User      @relation(fields: [userId], references: [userId])
@@ -89,6 +89,7 @@ model Review {
   evaluation  Int
   spoiler     Boolean
   Item        Item    @relation(fields: [itemId], references: [itemId])
+  User        User    @relation(fields: [userId], references: [userId])
 }
 
 model User {
@@ -105,8 +106,9 @@ model User {
   firstNameKana  String
   mailAddress    String
   password       String
-  favoriteId     Int?
+  favoriteId     Int?            @default(0)
   Cart           Cart[]
   RentalHistory  RentalHistory[]
+  Review         Review[]
   Category       Category?       @relation(fields: [favoriteId], references: [categoryId])
 }
