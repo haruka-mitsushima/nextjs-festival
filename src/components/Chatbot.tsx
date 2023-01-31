@@ -5,7 +5,6 @@ import { Item } from 'types/item';
 import Image from 'next/image';
 import Router from 'next/router';
 import React from 'react';
-import { config } from '../config/index';
 import { SessionUser } from 'pages/api/getUser';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -202,7 +201,6 @@ export default function Chatbot({
             fetch(`/api/selectAnswer/${feeling - 11}/${who - 14}`)
               .then((res) => res.json())
               .then((data) => {
-                console.log(data.genre);
                 setGenre(data.genre);
               });
             const id = setTimeout(() => {
