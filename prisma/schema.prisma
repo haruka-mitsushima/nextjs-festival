@@ -28,7 +28,7 @@ model Chatbot {
   text          String?
   continue      Boolean
   option        String
-  ChatbotChoice ChatbotChoice[]
+  chatbotChoice ChatbotChoice[]
 }
 
 model ChatbotAnswer {

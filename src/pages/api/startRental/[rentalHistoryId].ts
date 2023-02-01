@@ -1,7 +1,6 @@
 import { withIronSessionApiRoute } from 'iron-session/next';
 import { ironOptions } from '../../../../lib/ironOprion';
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '../../../../lib/prisma';
 import { RentalHistory } from 'types/user';
 
 export default withIronSessionApiRoute(startRentalRoute, ironOptions);

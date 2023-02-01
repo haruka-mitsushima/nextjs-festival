@@ -64,23 +64,23 @@ export default function ChatbotPage({
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
-    const chatList = await prisma.chatbot.findMany({
-      include: { chatbotChoice: true },
-      orderBy: { chatbotId: 'asc' },
-    });
-
+    const url = `http://localhost:3005/api/chatbot/getChatList`;
+    const response = await fetch(url);
+    const chatList = await response.json();
+    // const chatList = await prisma.chatbot.findMany({
+    //   include: { ChatbotChoice: true },
+    //   orderBy: { chatbotId: 'asc' },
+    // });
     let userName = 'guest';
     // ログインしている場合、userNameを取得する
-
     if (req.session.user) {
       const url = `http://localhost:3005/api/user/getUserName/${req.session.user.userId}`;
       const response = await fetch(url);
       const data = await response.json();
       if (data) {
-        userName = data;
+        userName = data.userName;
       }
     }
-
     return {
       props: {
         chatList,
