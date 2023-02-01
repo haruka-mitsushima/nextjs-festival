@@ -35,14 +35,6 @@ export default function Review({ itemId }: { itemId: number }) {
     const body = { itemId, orderBy, order, page: 1, pageSize };
     const url = 'http://localhost:3005/api/review/getSortedReview';
     axios.post(url, body).then((res) => setReview(res.data));
-    const params = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    };
-    fetch(url, params)
-      .then((res) => res.json())
-      .then((data) => setReview(data));
   }, [itemId, order, orderBy]);
 
   useEffect(() => {

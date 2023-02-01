@@ -11,6 +11,7 @@ import UseSWR, { mutate } from 'swr';
 import { SessionUser } from './api/getSessionInfo';
 import Header from '../components/Header';
 import loadStyles from 'styles/loading.module.css';
+import axios from 'axios';
 
 type ReviewItem = {
   reviewId: number;
@@ -86,25 +87,14 @@ export default function ReviewEdit({
       spoiler: formSpoiler,
     };
     const url = `http://localhost:3005/api/review/updateReviewById/${reviewItem.reviewId}`;
-    const params = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    };
-    await fetch(url, params).then(() => {
+    // const params = {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(body),
+    // };
+    await axios.post(url, body).then(() => {
       router.push(`/items/${reviewItem.item.itemId}`);
     });
-
-    // await fetch(`/api/updateReview`, {
-    //   method: 'POST',
-    //   body: JSON.stringify(body),
-    //   headers: {
-    //     'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
-    //   },
-    // }).then(() => {
-    //   router.push(`/items/${reviewItem.item.itemId}`);
-    //   //e.preventDefault()を行なった為、クライアント側の遷移処理をここで行う
-    // });
   };
 
   const logout = () => {
@@ -162,8 +152,8 @@ export const getServerSideProps = withIronSessionSsr(
   async ({ query }) => {
     const reviewId = Number(query.reviewId);
     const url = `http://localhost:3005/api/review/getReviewById/${reviewId}`;
-    const response = await fetch(url);
-    const reviewItem = await response.json();
+    const response = await axios.get(url);
+    const reviewItem = await response.data;
     if (reviewItem?.item) {
       const tmp: Item = reviewItem?.item;
       tmp.releaseDate = String(reviewItem?.item.releaseDate);

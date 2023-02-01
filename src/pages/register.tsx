@@ -5,6 +5,7 @@ import styleHeader from 'styles/header.module.css';
 import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
+import axios from 'axios';
 
 type Errors = {
   userName: string;
@@ -66,10 +67,8 @@ export default function LoginScreen() {
     let api = 'https://zipcloud.ibsnet.co.jp/api/search?zipcode=';
     let url = api + formValues.zipcode;
     //住所情報を取得
-    const response = await fetch(url, {
-      method: 'GET',
-    });
-    const Address = await response.json();
+    const response = await axios.get(url);
+    const Address = await response.data;
 
     //郵便番号が正しく取得できているか
     if (Address.results !== null) {
@@ -106,20 +105,13 @@ export default function LoginScreen() {
     e.preventDefault();
     const error: Errors = validate(formValues);
     // 登録済みのメールアドレスを確認する
-    const res = await fetch(
+    const res = await axios.post(
       'http://localhost:3005/api/user/mailConditions',
       {
-        //Jsonファイルに送る
-        method: 'POST',
-        body: JSON.stringify({
-          mailAddress: formValues.mailAddress,
-        }),
-        headers: {
-          'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
-        },
+        mailAddress: formValues.mailAddress,
       }
     );
-    const data = await res.json();
+    const data = await res.data;
     if (!data.result) {
       error.mailAddress = data.message;
     }
@@ -172,13 +164,8 @@ export default function LoginScreen() {
         mailAddress: formValues.mailAddress,
         password: formValues.password,
       };
-      const params = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      };
-      const response = await fetch(url, params);
-      const result = await response.json();
+      const response = await axios.post(url, data);
+      const result = await response.data;
       if (result.message === 'ok') await router.push('/registerComp');
     } else {
       router.push('/register');

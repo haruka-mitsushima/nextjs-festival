@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { withIronSessionApiRoute } from 'iron-session/next';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ironOptions } from '../../../lib/ironOprion';
@@ -23,12 +24,12 @@ async function addLogedinCart(req: NextApiRequest, res: NextApiResponse) {
 
         const body = { sessionCart };
         const url = 'http://localhost:3005/api/cart/addLogedinCart';
-        const params = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-        await fetch(url, params).then(() => { req.session.cart = []; })
+        // const params = {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(body),
+        // };
+        await axios.post(url, body).then(() => { req.session.cart = []; })
 
         // // cartテーブルに追加
         // await prisma.cart.createMany({

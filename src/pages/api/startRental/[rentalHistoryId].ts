@@ -2,6 +2,7 @@ import { withIronSessionApiRoute } from 'iron-session/next';
 import { ironOptions } from '../../../../lib/ironOprion';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { RentalHistory } from 'types/user';
+import axios from 'axios';
 
 export default withIronSessionApiRoute(startRentalRoute, ironOptions);
 
@@ -22,8 +23,8 @@ async function startRentalRoute(
 
 		// ログインユーザのレンタル履歴情報を取得
 		const url = `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`;
-		const response = await fetch(url);
-		const data = await response.json();
+		const response = await axios.get(url);
+		const data = await response.data;
 		const rentalHistory: RentalHistory[] = data.rental;
 		// const rentalHistory = await prisma.rentalHistory.findMany({
 		// 	where: {
@@ -57,22 +58,13 @@ async function startRentalRoute(
 			rentalStart: startDate,
 			rentalEnd: endDate
 		}
-
 		// データベースを更新する
 		const path = `http://localhost:3005/api/rentalHistory/updateRentalHistory/${rentalItem.rentalHistoryId}`;
-		const params = {
-			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(updateItem),
-		};
-		const result = await fetch(path, params);
-		// await prisma.rentalHistory.update({
-		// 	where: {
-		// 		rentalHistoryId: rentalItem.rentalHistoryId
-		// 	},
-		// 	data: updateItem
-		// })
-
-		res.json({ result: true })
+		// const params = {
+		// 	method: 'PATCH',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify(updateItem),
+		// };
+		await axios.patch(path, updateItem).then(() => res.json({ result: true }));
 	}
 }
