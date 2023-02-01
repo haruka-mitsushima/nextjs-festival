@@ -27,7 +27,7 @@ export default function RecommendItemList({
     const id = 3;
     const take = 10;
     const { data } = UseSWR<Array<Item>>(
-      `http://localhost:3005/api/item/favorite/${id}`,
+      `http://localhost:3005/api/item/favorite/${id}/${take}`,
       fetcher
     );
     if (data) {

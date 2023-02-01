@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import styles from 'styles/chatbot.module.css';
 import { Item } from 'types/item';
@@ -6,8 +6,6 @@ import Image from 'next/image';
 import Router from 'next/router';
 import React from 'react';
 import { SessionUser } from 'pages/api/getUser';
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type ChatList = {
   chatbotId: number;
@@ -50,7 +48,7 @@ export default function Chatbot({
 
   useEffect(() => {
     // itemsを取得
-    fetch(`/api/selectGenre/${genre}/4`)
+    fetch(`http://localhost:3005/api/item/favorite/${genre}/4`)
       .then((res) => res.json())
       .then((data) => {
         setItems(data);
@@ -198,10 +196,14 @@ export default function Chatbot({
       if (option === 2) {
         if (method === 4) {
           if (!selectWhoButton) {
-            fetch(`/api/selectAnswer/${feeling - 11}/${who - 14}`)
+            fetch(
+              `http://localhost:3005/api/chatbot/getAnswer/${
+                feeling - 11
+              }/${who - 14}`
+            )
               .then((res) => res.json())
               .then((data) => {
-                setGenre(data.genre);
+                setGenre(Number(data));
               });
             const id = setTimeout(() => {
               setCount((prev) => prev + 1);
@@ -269,8 +271,9 @@ export default function Chatbot({
   const submit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setButton(false);
-    const info = { favoriteGenre: genre };
-    await fetch(`/api/updateUser/${data.userId}/${genre}`);
+    await fetch(
+      `http://localhost:3005/api/user/updateUser/${data.userId}/${genre}`
+    );
   };
 
   const route = () => {
