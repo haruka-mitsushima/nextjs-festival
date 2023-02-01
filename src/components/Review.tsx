@@ -15,7 +15,7 @@ type Review = {
   evaluation: number;
   spoiler: boolean;
   items: Item;
-  users: User;
+  user: User;
 };
 
 export default function Review({ itemId }: { itemId: number }) {
@@ -110,7 +110,7 @@ export default function Review({ itemId }: { itemId: number }) {
                   )}
                 </label>
                 <div className={styles.contentBody}>
-                  <p>投稿者名：{review.users.userName}</p>
+                  <p>投稿者名：{review.user.userName}</p>
                   <p>投稿日：{review.postTime}</p>
                   <p>点数：{review.evaluation}点</p>
                   <p>{review.reviewText}</p>
