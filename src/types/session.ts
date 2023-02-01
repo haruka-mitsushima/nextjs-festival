@@ -4,7 +4,7 @@ type SessionUserCart = {
   cartId: number;
   itemId: number;
   rentalPeriod: number;
-  items: Item;
+  item: Item;
 };
 
-export type {SessionUserCart}
+export type { SessionUserCart }

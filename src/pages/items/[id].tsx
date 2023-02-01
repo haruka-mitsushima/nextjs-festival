@@ -12,13 +12,14 @@ import loadStyles from 'styles/loading.module.css';
 import Review from '../../components/Review';
 import ReviewBtn from 'components/ReviewBtn';
 import Countdown from '../../components/Countdown';
+import axios from 'axios';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export async function getStaticPaths() {
   const url = 'http://localhost:3005/api/item/getAllItems';
-  const response = await fetch(url);
-  const data = await response.json();
+  const response = await axios.get(url);
+  const data = await response.data;
   const paths = data.map((item: { itemId: number }) => {
     return {
       params: {
@@ -39,8 +40,8 @@ export async function getStaticProps({
 }) {
   const id = parseInt(params.id);
   const url = `http://localhost:3005/api/item/getItemById/${id}`;
-  const response = await fetch(url);
-  const item = await response.json();
+  const response = await axios.get(url);
+  const item = await response.data;
   if (!item) {
     return {
       redirect: {
@@ -79,13 +80,18 @@ export default function ItemDetail({ item }: { item: Item }) {
   }
 
   useEffect(() => {
-    fetch(
-      `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`
-    )
-      .then((res) => res.json())
-      .then((result) => {
-        setRental(result.rental);
-      });
+    axios
+      .get(
+        `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`
+      )
+      .then((res) => setRental(res.data.rental));
+    // fetch(
+    //   `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`
+    // )
+    //   .then((res) => res.json())
+    //   .then((result) => {
+    //     setRental(result.rental);
+    //   });
   }, [userId]);
 
   const isLoggedIn = data?.isLoggedIn;
@@ -197,15 +203,15 @@ export default function ItemDetail({ item }: { item: Item }) {
 
     // ログイン後
     if (userId !== undefined) {
-      await fetch(
-        `http://localhost:3005/api/cart/addCart/${userId}/${itemId}/${period}`
-      )
-        .then((res) => res.json())
-        .then((result) => {
+      await axios
+        .get(
+          `http://localhost:3005/api/cart/addCart/${userId}/${itemId}/${period}`
+        )
+        .then((res) => {
           if (isChoiced === true) {
             setIsChoiced(!isChoiced);
           }
-          if (result.isAdd === true) {
+          if (res.data.isAdd === true) {
             cartflg = true;
             mutate('/api/getUser');
           }
@@ -228,20 +234,14 @@ export default function ItemDetail({ item }: { item: Item }) {
         rentalPeriod: period,
         itemImage: item.itemImage,
         itemId: item.itemId,
-        items: item,
+        item: item,
       };
 
       const body = { cart: userCarts };
       // cookieに保存するために/api/cartに飛ばす
-      fetch(`/api/addCart`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })
-        .then((res) => res.json())
-        .then((result) => {
+      axios
+        .post(`/api/addCart`, body)
+        .then(() => {
           if (isChoiced === true) {
             setIsChoiced(!isChoiced);
           }
@@ -259,7 +259,7 @@ export default function ItemDetail({ item }: { item: Item }) {
     const id = data.userId;
     // ログイン後の場合
     if (id !== undefined) {
-      await fetch(
+      await axios.get(
         `http://localhost:3005/api/cart/deleteCart/${cartId}`
       );
       mutate('/api/getUser');
@@ -267,15 +267,9 @@ export default function ItemDetail({ item }: { item: Item }) {
       // ログイン前の場合
       const body = { id: item.itemId, detail: true };
 
-      await fetch(`/api/itemDelete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })
-        .then((res) => res.json())
-        .then((result) => {
+      await axios
+        .post(`/api/itemDelete`, body)
+        .then(() => {
           cartflg = false;
           mutate('/api/getUser');
         })

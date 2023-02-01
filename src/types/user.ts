@@ -47,7 +47,7 @@ type UserCart = {
   userId?: number;
   // 単位：日
   rentalPeriod: number;
-  items: Item;
+  item: Item;
 };
 
 

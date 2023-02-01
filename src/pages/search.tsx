@@ -12,6 +12,7 @@ import SortSelect from 'components/SortSelect';
 import UseSWR, { mutate } from 'swr';
 import { SessionUser } from '../pages/api/getUser';
 import loadStyles from 'styles/loading.module.css';
+import axios from 'axios';
 
 // 1ページあたりの最大表示件数を指定
 const PAGE_SIZE = 10;
@@ -196,22 +197,26 @@ export async function getServerSideProps({
   const take = PAGE_SIZE;
 
   if (keyword?.length === 0 && genre === 0) {
-    const url = 'http://localhost:3005/api/item/new';
-    const response = await fetch(url);
-    const selectNew = await response.json();
+    const res = await axios.get('http://localhost:3005/api/item/new');
+    const selectNew = await res.data;
+    // const url = 'http://localhost:3005/api/item/new';
+    // const response = await fetch(url);
+    // const selectNew = await response.json();
     // const selectNew = await selectNewItem(10);
     newItems = selectNew;
   }
 
   const body = { keyword, genre, orderBy, order, page, take };
   const url = 'http://localhost:3005/api/search';
-  const params = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  };
-  const response = await fetch(url, params);
-  const data = await response.json();
+  const response = axios.post(url, body);
+  const data = await (await response).data;
+  // // const params = {
+  // //   method: 'POST',
+  // //   headers: { 'Content-Type': 'application/json' },
+  // //   body: JSON.stringify(body),
+  // // };
+  // const response = await fetch(url, params);
+  // cosnt data = await response.json();
 
   if (!data) {
     return;

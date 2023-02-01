@@ -10,6 +10,7 @@ import Header from '../components/Header';
 import { SessionUser } from 'pages/api/getSessionInfo';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import axios from 'axios';
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
@@ -25,8 +26,8 @@ export const getServerSideProps: GetServerSideProps =
     if (req.session.user) {
       user.userId = req.session.user.userId;
       const url = `http://localhost:3005/api/user/selectCart/${user.userId}`;
-      const response = await fetch(url);
-      const res = await response.json();
+      const response = await axios(url);
+      const res = await response.data;
       // const res = await SelectCart(user.userId);
       user.userCarts = res.cart;
       user.isLoggedIn = true;
@@ -65,9 +66,9 @@ export default function Payment({
     ?.map((item) => {
       let price = 0;
       if (item.rentalPeriod === 2) {
-        price = item.items.twoDaysPrice;
+        price = item.item.twoDaysPrice;
       } else {
-        price = item.items.sevenDaysPrice;
+        price = item.item.sevenDaysPrice;
       }
       return price;
     })
@@ -102,23 +103,23 @@ export default function Payment({
               <div className={styles.itemWrapper}>
                 <div className={styles.ItemInfo}>
                   <Image
-                    src={item.items.itemImage}
+                    src={item.item.itemImage}
                     width={200}
                     height={112}
                     alt={'商品画像のURL'}
                     priority
                   />
                   <div className={styles.itemName}>
-                    <p>{`${item.items.artist}  ${item.items.fesName}`}</p>
+                    <p>{`${item.item.artist}  ${item.item.fesName}`}</p>
                     <p>レンタル期間：{item.rentalPeriod}泊</p>
                   </div>
                 </div>
                 <div className={styles.price}>
                   <p>価格</p>
                   {item.rentalPeriod === 2 ? (
-                    <div>{item.items.twoDaysPrice}円</div>
+                    <div>{item.item.twoDaysPrice}円</div>
                   ) : (
-                    <div>{item.items.sevenDaysPrice}円</div>
+                    <div>{item.item.sevenDaysPrice}円</div>
                   )}
                 </div>
               </div>

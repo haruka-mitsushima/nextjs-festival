@@ -1,3 +1,4 @@
+import axios from 'axios';
 import styles from 'styles/cart.module.css';
 import { UserCart } from 'types/user';
 
@@ -16,31 +17,19 @@ export default function DeleteBtn({
     if (id !== undefined) {
       // ログイン後の場合
       // deleteCartに飛ばす
-      await fetch(
+      await axios.get(
         `http://localhost:3005/api/cart/deleteCart/${cartId}`
       );
-      await fetch(
-        `http://localhost:3005/api/user/selectCart/${id}`
-      ).then((res) =>
-        res.json().then((result) => {
-          rebuild(result.cart);
-        })
-      );
+      await axios
+        .get(`http://localhost:3005/api/user/selectCart/${id}`)
+        .then((res) => rebuild(res.data.cart));
     } else {
       // ログイン前の場合
       const body = { id: itemId };
 
-      await fetch(`/api/itemDelete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          rebuild(result.cart);
-        })
+      await axios
+        .post(`/api/itemDelete`, body)
+        .then((res) => rebuild(res.data.cart))
         .catch((error) => {
           console.log('Error', error);
         });

@@ -1,5 +1,6 @@
+import axios from 'axios';
 import { useRouter } from 'next/router';
-import ReactPlayer from 'react-player'
+import ReactPlayer from 'react-player';
 import styles from '../styles/player.module.css';
 
 type playerProps = {
@@ -8,15 +9,18 @@ type playerProps = {
   startPlayer: () => void;
 };
 
-export default function Player({ closePlayer, id, startPlayer }: playerProps) {
+export default function Player({
+  closePlayer,
+  id,
+  startPlayer,
+}: playerProps) {
   const router = useRouter();
   const sample = (id: number) => {
-    fetch(`/api/startRental/${id}`, {
-    }).then((response) => response.json()).then((data) => {
-      if (data.result) {
-        startPlayer()
+    axios.get(`/api/startRental/${id}`).then((res) => {
+      if (res.data.result) {
+        startPlayer();
       } else {
-        router.push('/error')
+        router.push('/error');
       }
     });
   };
