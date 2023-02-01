@@ -12,8 +12,6 @@ import SortSelect from 'components/SortSelect';
 import UseSWR, { mutate } from 'swr';
 import { SessionUser } from '../pages/api/getUser';
 import loadStyles from 'styles/loading.module.css';
-import searchItem from './api/searchItem';
-import selectNewItem from './api/selectNewItem';
 
 // 1ページあたりの最大表示件数を指定
 const PAGE_SIZE = 10;
@@ -189,38 +187,44 @@ export async function getServerSideProps({
   query,
 }: GetServerSidePropsContext) {
   let newItems = null;
+  let result = null;
   const keyword = query.q;
   const genre = query.page ? Number(query.categories) : 0;
   const page = query.page ? Number(query.page) : 1;
   const orderBy = query.orderBy ? query.orderBy : 'itemId';
   const order = query.order ? query.order : 'desc';
   const take = PAGE_SIZE;
-  const result = await searchItem(
-    keyword,
-    genre,
-    orderBy,
-    order,
-    page,
-    take
-  );
-
-  if (!result) {
-    return;
-  }
 
   if (keyword?.length === 0 && genre === 0) {
-    const selectNew = await selectNewItem(10);
+    const url = 'http://localhost:3005/api/item/new';
+    const response = await fetch(url);
+    const selectNew = await response.json();
+    // const selectNew = await selectNewItem(10);
     newItems = selectNew;
+  }
+
+  const body = { keyword, genre, orderBy, order, page, take };
+  const url = 'http://localhost:3005/api/search';
+  const params = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(url, params);
+  const data = await response.json();
+
+  if (!data) {
+    return;
   }
 
   return {
     props: {
-      items: result.items,
+      items: data.items,
       newItems: newItems,
       keyword: keyword,
       genre: genre,
       page: page,
-      totalCount: result.count,
+      totalCount: data.count,
       orderBy: orderBy,
       order: order,
     },
