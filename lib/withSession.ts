@@ -13,7 +13,7 @@ declare module 'iron-session' {
       cartId: number;
       itemId: number;
       rentalPeriod: number;
-      items: Item
+      item: Item
     }[];
   }
 }

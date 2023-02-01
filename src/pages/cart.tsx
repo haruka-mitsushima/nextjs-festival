@@ -7,12 +7,12 @@ import UseSWR, { mutate } from 'swr';
 import Header from '../components/Header';
 import Head from 'next/head';
 import loadStyles from 'styles/loading.module.css';
-import { Item } from 'types/item';
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
 import { GetServerSideProps } from 'next';
 import { SessionUserCart } from 'types/session';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -23,8 +23,8 @@ export const getServerSideProps: GetServerSideProps =
     if (userId) {
       // ログイン後
       const url = `http://localhost:3005/api/user/selectCart/${userId}`;
-      const response = await fetch(url);
-      const res = await response.json();
+      const response = await axios.get(url);
+      const res = await response.data;
       // const res = await SelectCart(userId);
       if (res.errorFlg) {
         return {
@@ -93,9 +93,9 @@ export default function CartList({ cart }: { cart: UserCart[] }) {
   if (cartItem !== undefined) {
     cartItem.map((item) => {
       if (item.rentalPeriod === 2) {
-        sum.push(item.items.twoDaysPrice);
+        sum.push(item.item.twoDaysPrice);
       } else if (item.rentalPeriod === 7) {
-        sum.push(item.items.sevenDaysPrice);
+        sum.push(item.item.sevenDaysPrice);
       }
     });
   }
@@ -125,7 +125,7 @@ export default function CartList({ cart }: { cart: UserCart[] }) {
                     <figure className={styles.cartImgWrapper}>
                       <Image
                         className={styles.cartImg}
-                        src={item.items.itemImage}
+                        src={item.item.itemImage}
                         width={200}
                         height={112}
                         alt="商品の画像"
@@ -134,7 +134,7 @@ export default function CartList({ cart }: { cart: UserCart[] }) {
                     </figure>
                     <div className={styles.cartBody}>
                       <p className={styles.cartTitle}>
-                        {`${item.items.artist}  ${item.items.fesName}`}
+                        {`${item.item.artist}  ${item.item.fesName}`}
                       </p>
                       <p>
                         レンタル期間：
@@ -152,11 +152,11 @@ export default function CartList({ cart }: { cart: UserCart[] }) {
                     <p>価格</p>
                     {item.rentalPeriod === 2 ? (
                       <p className={styles.cartPrice}>
-                        {item.items.twoDaysPrice}円
+                        {item.item.twoDaysPrice}円
                       </p>
                     ) : (
                       <p className={styles.cartPrice}>
-                        {item.items.sevenDaysPrice}円
+                        {item.item.sevenDaysPrice}円
                       </p>
                     )}
                     <DeleteBtn

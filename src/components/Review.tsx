@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ReviewSelect from './ReviewSort';
 import { Item } from 'types/item';
 import { User } from '@prisma/client';
+import axios from 'axios';
 
 type Review = {
   reviewId: number;
@@ -33,6 +34,7 @@ export default function Review({ itemId }: { itemId: number }) {
   useEffect(() => {
     const body = { itemId, orderBy, order, page: 1, pageSize };
     const url = 'http://localhost:3005/api/review/getSortedReview';
+    axios.post(url, body).then((res) => setReview(res.data));
     const params = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,26 +46,32 @@ export default function Review({ itemId }: { itemId: number }) {
   }, [itemId, order, orderBy]);
 
   useEffect(() => {
-    fetch(
-      `http://localhost:3005/api/review/getAverageScore/${itemId}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setAverage(data);
-      });
+    axios
+      .get(
+        `http://localhost:3005/api/review/getAverageScore/${itemId}`
+      )
+      .then((res) => setAverage(res.data));
+    // fetch(
+    //   `http://localhost:3005/api/review/getAverageScore/${itemId}`
+    // )
+    //   .then((res) => res.json())
+    //   .then((data) => {
+    //     setAverage(data);
+    //   });
   }, [itemId]);
 
   const onClick = (number: number) => {
     const body = { itemId, orderBy, order, page: number, pageSize };
     const url = 'http://localhost:3005/api/review/getSortedReview';
-    const params = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    };
-    fetch(url, params)
-      .then((res) => res.json())
-      .then((data) => setReview(data));
+    axios.post(url, body).then((res) => setReview(res.data));
+    // const params = {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(body),
+    // };
+    // fetch(url, params)
+    //   .then((res) => res.json())
+    //   .then((data) => setReview(data));
   };
 
   const totalCount = average.totalCount;

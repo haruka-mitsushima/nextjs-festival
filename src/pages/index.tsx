@@ -9,6 +9,7 @@ import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '../../lib/ironOprion';
 import { useState } from 'react';
 import { SessionUser } from './api/getSessionInfo';
+import axios from 'axios';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -83,13 +84,17 @@ export const getServerSideProps = withIronSessionSsr(
     if (req.session.user) {
       const body = { userId: req.session.user.userId };
       const url = 'http://localhost:3005/api/user';
-      const params = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      };
-      const response = await fetch(url, params);
-      const data = await response.json();
+      const response = await axios.post(url, body);
+      const data = await response.data;
+      // const body = { userId: req.session.user.userId };
+      // const url = 'http://localhost:3005/api/user';
+      // const params = {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(body),
+      // };
+      // const response = await fetch(url, params);
+      // const data = await response.json();
       if (data?.favoriteId) {
         favoriteId = data.favoriteId;
         useChatbot = true;
@@ -104,13 +109,17 @@ export const getServerSideProps = withIronSessionSsr(
     // 作品情報取得
     const body = { favoriteId };
     const url = 'http://localhost:3005/api/item/preTop';
-    const params = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    };
-    const response = await fetch(url, params);
-    const { newItems, genreItems } = await response.json();
+    const response = await axios.post(url, body);
+    const { newItems, genreItems } = await response.data;
+    // const body = { favoriteId };
+    // const url = 'http://localhost:3005/api/item/preTop';
+    // const params = {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(body),
+    // };
+    // const response = await fetch(url, params);
+    // const { newItems, genreItems } = await response.json();
 
     return {
       props: {
