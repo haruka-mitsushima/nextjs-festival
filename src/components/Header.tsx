@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -102,9 +103,9 @@ export default function Header({
                       href="/api/logout"
                       onClick={async (e) => {
                         e.preventDefault();
-                        await fetch('/api/logout').then(() =>
-                          dologout()
-                        );
+                        await axios
+                          .get('/api/logout')
+                          .then(() => dologout());
                       }}
                     >
                       <div className={styles.btnWrapper}>
@@ -185,9 +186,9 @@ export default function Header({
                       href="/api/logout"
                       onClick={async (e) => {
                         e.preventDefault();
-                        await fetch('/api/logout').then(() =>
-                          dologout()
-                        );
+                        await axios
+                          .get('/api/logout')
+                          .then(() => dologout());
                       }}
                     >
                       <div className={styles.btnWrapper}>

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { withIronSessionApiRoute } from "iron-session/next";
 import { ironOptions } from "../../../lib/ironOprion"
 
@@ -5,13 +6,8 @@ export default withIronSessionApiRoute(
   async function loginRoute(req, res) {
     const body = { ...req.body };
     const url = 'http://localhost:3005/api/user/login';
-    const params = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    };
-    const response = await fetch(url, params);
-    const data = await response.json();
+    const response = await axios.post(url, body);
+    const data = await response.data;
 
     if (data) {
       req.session.user = {

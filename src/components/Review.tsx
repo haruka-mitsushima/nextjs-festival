@@ -15,7 +15,7 @@ type Review = {
   evaluation: number;
   spoiler: boolean;
   items: Item;
-  users: User;
+  user: User;
 };
 
 export default function Review({ itemId }: { itemId: number }) {
@@ -35,14 +35,6 @@ export default function Review({ itemId }: { itemId: number }) {
     const body = { itemId, orderBy, order, page: 1, pageSize };
     const url = 'http://localhost:3005/api/review/getSortedReview';
     axios.post(url, body).then((res) => setReview(res.data));
-    const params = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    };
-    fetch(url, params)
-      .then((res) => res.json())
-      .then((data) => setReview(data));
   }, [itemId, order, orderBy]);
 
   useEffect(() => {
@@ -118,7 +110,7 @@ export default function Review({ itemId }: { itemId: number }) {
                   )}
                 </label>
                 <div className={styles.contentBody}>
-                  <p>投稿者名：{review.users.userName}</p>
+                  <p>投稿者名：{review.user.userName}</p>
                   <p>投稿日：{review.postTime}</p>
                   <p>点数：{review.evaluation}点</p>
                   <p>{review.reviewText}</p>

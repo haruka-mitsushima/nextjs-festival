@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import Link from 'next/link';
 import styles from 'styles/login.module.css';
 import Image from 'next/image';
 import Header from '../components/Header';
+import axios from 'axios';
 
 export default function Home() {
   const [mailAddress, setMailAddress] = useState(''); //名前の情報を更新して保存
@@ -17,21 +17,15 @@ export default function Home() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault(); //既定の動作を止める
-    await fetch('/api/login', {
-      //Jsonファイルに送る
-      method: 'POST',
-      body: JSON.stringify({
-        mailAddress,
-        password,
-      }),
-      headers: {
-        'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
-      },
-    }).then(async (res) => {
+    const body = {
+      mailAddress,
+      password,
+    };
+    await axios.post('/api/login', body).then(async (res) => {
       if (res.status === 200) {
-        await fetch('/api/addLogedinCart').then(() =>
-          router.push('/')
-        );
+        await axios
+          .get('/api/addLogedinCart')
+          .then(() => router.push('/'));
       } else {
         setErrorMessage(
           '※メールアドレスまたはパスワードが間違っています'

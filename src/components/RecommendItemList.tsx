@@ -4,10 +4,7 @@ import { Item } from 'types/item';
 import styles from 'styles/itemList.module.css';
 import { SessionUser } from 'pages/api/getUser';
 import Router from 'next/router';
-import UseSWR from 'swr';
-
-const fetcher = (url: string, init: any) =>
-  fetch(url, init).then((res) => res.json());
+import axios from 'axios';
 
 export default function RecommendItemList({
   items,
@@ -26,13 +23,13 @@ export default function RecommendItemList({
   if (doLogout) {
     const id = 3;
     const take = 10;
-    const { data } = UseSWR<Array<Item>>(
-      `http://localhost:3005/api/item/favorite/${id}/${take}`,
-      fetcher
-    );
-    if (data) {
-      logItems.push(...data);
-    }
+    const getLogItem = async () => {
+      const response = await axios.get(
+        `http://localhost:3005/api/item/favorite/${id}/${take}`
+      );
+      logItems.push(response.data);
+    };
+    getLogItem();
   }
 
   const route = () => {

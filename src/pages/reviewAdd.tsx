@@ -11,6 +11,7 @@ import { ironOptions } from '../../lib/ironOprion';
 import UseSWR, { mutate } from 'swr';
 import { SessionUser } from './api/getSessionInfo';
 import Header from '../components/Header';
+import axios from 'axios';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -67,15 +68,11 @@ export default function Review({ item }: { item: Item }) {
       spoiler: formSpoiler,
     };
 
-    await fetch('http://localhost:3005/api/review/createReview', {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-type': 'application/json', //Jsonファイルということを知らせるために行う
-      },
-    }).then(() => {
-      router.push(`/items/${item.itemId}`); //e.preventDefault()を行なった為、クライアント側の遷移処理をここで行う
-    });
+    await axios
+      .post('http://localhost:3005/api/review/createReview', body)
+      .then(() => {
+        router.push(`/items/${item.itemId}`); //e.preventDefault()を行なった為、クライアント側の遷移処理をここで行う
+      });
   };
 
   const logout = () => {
@@ -134,8 +131,8 @@ export default function Review({ item }: { item: Item }) {
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, query }) => {
     const url = `http://localhost:3005/api/item/getItemById/${query.itemId}`;
-    const response = await fetch(url);
-    const item = await response.json();
+    const response = await axios.get(url);
+    const item = await response.data;
     if (!req.session.user) {
       return {
         redirect: {
