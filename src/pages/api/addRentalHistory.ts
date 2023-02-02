@@ -15,7 +15,7 @@ async function getUserRoute(
     const userId = req.session.user.userId;
 
     // ユーザ情報に紐づくカートの取得
-    const url = `http://localhost:3005/api/user/selectCart/${userId}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/user/selectCart/${userId}`;
     const response = await axios.get(url);
     const result = await response.data;
     // const result = await prisma.user.findUnique({
@@ -56,7 +56,7 @@ async function getUserRoute(
 
     // レンタル履歴テーブルとカートテーブルを同時更新
     const body = { addItem };
-    const path = `http://localhost:3005/api/payment/addRentalHistory/${userId}`;
+    const path = `${process.env.NEXT_PUBLIC_API_URL}/api/payment/addRentalHistory/${userId}`;
     // const params = {
     //   method: 'POST',
     //   headers: { 'Content-Type': 'application/json' },

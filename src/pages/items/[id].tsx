@@ -17,7 +17,7 @@ import axios from 'axios';
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export async function getStaticPaths() {
-  const url = 'http://localhost:3005/api/item/getAllItems';
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/item/getAllItems`;
   const response = await axios.get(url);
   const data = await response.data;
   const paths = data.map((item: { itemId: number }) => {
@@ -39,7 +39,7 @@ export async function getStaticProps({
   params: { id: string };
 }) {
   const id = parseInt(params.id);
-  const url = `http://localhost:3005/api/item/getItemById/${id}`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/item/getItemById/${id}`;
   const response = await axios.get(url);
   const item = await response.data;
   if (!item) {
@@ -82,7 +82,7 @@ export default function ItemDetail({ item }: { item: Item }) {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/rentalHistory/selectRentalHistory/${userId}`
       )
       .then((res) => setRental(res.data.rental));
     // fetch(
@@ -205,7 +205,7 @@ export default function ItemDetail({ item }: { item: Item }) {
     if (userId !== undefined) {
       await axios
         .get(
-          `http://localhost:3005/api/cart/addCart/${userId}/${itemId}/${period}`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/cart/addCart/${userId}/${itemId}/${period}`
         )
         .then((res) => {
           if (isChoiced === true) {
@@ -260,7 +260,7 @@ export default function ItemDetail({ item }: { item: Item }) {
     // ログイン後の場合
     if (id !== undefined) {
       await axios.get(
-        `http://localhost:3005/api/cart/deleteCart/${cartId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/deleteCart/${cartId}`
       );
       mutate('/api/getUser');
     } else {

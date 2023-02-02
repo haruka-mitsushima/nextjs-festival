@@ -18,10 +18,12 @@ export default function DeleteBtn({
       // ログイン後の場合
       // deleteCartに飛ばす
       await axios.get(
-        `http://localhost:3005/api/cart/deleteCart/${cartId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/deleteCart/${cartId}`
       );
       await axios
-        .get(`http://localhost:3005/api/user/selectCart/${id}`)
+        .get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/selectCart/${id}`
+        )
         .then((res) => rebuild(res.data.cart));
     } else {
       // ログイン前の場合

@@ -22,7 +22,7 @@ async function startRentalRoute(
 		const userId = req.session.user.userId;
 
 		// ログインユーザのレンタル履歴情報を取得
-		const url = `http://localhost:3005/api/rentalHistory/selectRentalHistory/${userId}`;
+		const url = `${process.env.NEXT_PUBLIC_API_URL}/api/rentalHistory/selectRentalHistory/${userId}`;
 		const response = await axios.get(url);
 		const data = await response.data;
 		const rentalHistory: RentalHistory[] = data.rental;
@@ -59,7 +59,7 @@ async function startRentalRoute(
 			rentalEnd: endDate
 		}
 		// データベースを更新する
-		const path = `http://localhost:3005/api/rentalHistory/updateRentalHistory/${rentalItem.rentalHistoryId}`;
+		const path = `${process.env.NEXT_PUBLIC_API_URL}/api/rentalHistory/updateRentalHistory/${rentalItem.rentalHistoryId}`;
 		// const params = {
 		// 	method: 'PATCH',
 		// 	headers: { 'Content-Type': 'application/json' },
