@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps =
     let userId = req.session.user?.userId;
     if (userId) {
       // ログイン後
-      const url = `http://localhost:3005/api/user/selectCart/${userId}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/user/selectCart/${userId}`;
       const response = await axios.get(url);
       const res = await response.data;
       // const res = await SelectCart(userId);

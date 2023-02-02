@@ -33,14 +33,14 @@ export default function Review({ itemId }: { itemId: number }) {
 
   useEffect(() => {
     const body = { itemId, orderBy, order, page: 1, pageSize };
-    const url = 'http://localhost:3005/api/review/getSortedReview';
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/review/getSortedReview`;
     axios.post(url, body).then((res) => setReview(res.data));
   }, [itemId, order, orderBy]);
 
   useEffect(() => {
     axios
       .get(
-        `http://localhost:3005/api/review/getAverageScore/${itemId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/review/getAverageScore/${itemId}`
       )
       .then((res) => setAverage(res.data));
     // fetch(
@@ -54,7 +54,7 @@ export default function Review({ itemId }: { itemId: number }) {
 
   const onClick = (number: number) => {
     const body = { itemId, orderBy, order, page: number, pageSize };
-    const url = 'http://localhost:3005/api/review/getSortedReview';
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/review/getSortedReview`;
     axios.post(url, body).then((res) => setReview(res.data));
     // const params = {
     //   method: 'POST',

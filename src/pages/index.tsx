@@ -83,7 +83,7 @@ export const getServerSideProps = withIronSessionSsr(
     // ログインしている場合、favoriteIdを取得する
     if (req.session.user) {
       const body = { userId: req.session.user.userId };
-      const url = 'http://localhost:3005/api/user';
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/user`;
       const response = await axios.post(url, body);
       const data = await response.data;
       // const body = { userId: req.session.user.userId };
@@ -108,7 +108,7 @@ export const getServerSideProps = withIronSessionSsr(
 
     // 作品情報取得
     const body = { favoriteId };
-    const url = 'http://localhost:3005/api/item/preTop';
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/item/preTop`;
     const response = await axios.post(url, body);
     const { newItems, genreItems } = await response.data;
     // const body = { favoriteId };

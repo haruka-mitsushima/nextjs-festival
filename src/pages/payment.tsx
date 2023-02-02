@@ -25,7 +25,7 @@ export const getServerSideProps: GetServerSideProps =
     // ログインしている場合、カート情報を取得する
     if (req.session.user) {
       user.userId = req.session.user.userId;
-      const url = `http://localhost:3005/api/user/selectCart/${user.userId}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/user/selectCart/${user.userId}`;
       const response = await axios(url);
       const res = await response.data;
       // const res = await SelectCart(user.userId);

@@ -86,7 +86,7 @@ export default function ReviewEdit({
       evaluation: formEvaluation,
       spoiler: formSpoiler,
     };
-    const url = `http://localhost:3005/api/review/updateReviewById/${reviewItem.reviewId}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/review/updateReviewById/${reviewItem.reviewId}`;
     // const params = {
     //   method: 'POST',
     //   headers: { 'Content-Type': 'application/json' },
@@ -151,7 +151,7 @@ export default function ReviewEdit({
 export const getServerSideProps = withIronSessionSsr(
   async ({ query }) => {
     const reviewId = Number(query.reviewId);
-    const url = `http://localhost:3005/api/review/getReviewById/${reviewId}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/review/getReviewById/${reviewId}`;
     const response = await axios.get(url);
     const reviewItem = await response.data;
     if (reviewItem?.item) {

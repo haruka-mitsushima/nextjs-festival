@@ -5,7 +5,6 @@ import Header from 'components/Header';
 import React from 'react';
 import loadStyles from 'styles/loading.module.css';
 import Chatbot from 'components/Chatbot';
-import prisma from '../../lib/prisma';
 import { ironOptions } from '../../lib/ironOprion';
 import { withIronSessionSsr } from 'iron-session/next';
 import axios from 'axios';
@@ -65,7 +64,7 @@ export default function ChatbotPage({
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req }) => {
-    const url = `http://localhost:3005/api/chatbot/getChatList`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/chatbot/getChatList`;
     const response = await axios.get(url);
     const chatList = await response.data;
     // const chatList = await prisma.chatbot.findMany({
@@ -75,7 +74,7 @@ export const getServerSideProps = withIronSessionSsr(
     let userName = 'guest';
     // ログインしている場合、userNameを取得する
     if (req.session.user) {
-      const url = `http://localhost:3005/api/user/getUserName/${req.session.user.userId}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/user/getUserName/${req.session.user.userId}`;
       const response = await axios.get(url);
       const data = await response.data;
       if (data) {

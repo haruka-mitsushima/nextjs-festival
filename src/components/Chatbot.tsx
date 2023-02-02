@@ -50,7 +50,9 @@ export default function Chatbot({
   useEffect(() => {
     // itemsを取得
     axios
-      .get(`http://localhost:3005/api/item/favorite/${genre}/4`)
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/item/favorite/${genre}/4`
+      )
       .then((res) => res.data)
       .then((data) => {
         setItems(data);
@@ -200,9 +202,9 @@ export default function Chatbot({
           if (!selectWhoButton) {
             axios
               .get(
-                `http://localhost:3005/api/chatbot/getAnswer/${
-                  feeling - 11
-                }/${who - 14}`
+                `${
+                  process.env.NEXT_PUBLIC_API_URL
+                }/api/chatbot/getAnswer/${feeling - 11}/${who - 14}`
               )
               .then((res) => res.data)
               .then((data) => {
@@ -275,7 +277,7 @@ export default function Chatbot({
     e.preventDefault();
     setButton(false);
     await axios.patch(
-      `http://localhost:3005/api/user/updateUser/${data.userId}/${genre}`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user/updateUser/${data.userId}/${genre}`
     );
   };
   const route = () => {

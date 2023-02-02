@@ -18,7 +18,7 @@ export default function Review({
 }) {
   // ユーザーのレビュー情報を取得
   const { data } = useSWR(
-    `http://localhost:3005/api/review/getUserReview/${userId}/${id}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/review/getUserReview/${userId}/${id}`,
     fetcher
   );
 

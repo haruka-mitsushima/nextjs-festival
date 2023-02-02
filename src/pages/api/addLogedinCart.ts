@@ -23,7 +23,7 @@ async function addLogedinCart(req: NextApiRequest, res: NextApiResponse) {
         })
 
         const body = { sessionCart };
-        const url = 'http://localhost:3005/api/cart/addLogedinCart';
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/cart/addLogedinCart`;
         // const params = {
         //     method: 'POST',
         //     headers: { 'Content-Type': 'application/json' },

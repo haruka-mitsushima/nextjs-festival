@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import styles from 'styles/register.module.css';
 import styleHeader from 'styles/header.module.css';
@@ -106,7 +106,7 @@ export default function LoginScreen() {
     const error: Errors = validate(formValues);
     // 登録済みのメールアドレスを確認する
     const res = await axios.post(
-      'http://localhost:3005/api/user/mailConditions',
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user/mailConditions`,
       {
         mailAddress: formValues.mailAddress,
       }
@@ -148,7 +148,7 @@ export default function LoginScreen() {
       error.passwordTest === ''
     ) {
       // 登録内容を登録する
-      const url = 'http://localhost:3005/api/user/signup';
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/user/signup`;
       const data = {
         //Jsonデータに保存する内容を記載
         userName: formValues.userName,

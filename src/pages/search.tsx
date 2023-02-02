@@ -197,7 +197,9 @@ export async function getServerSideProps({
   const take = PAGE_SIZE;
 
   if (keyword?.length === 0 && genre === 0) {
-    const res = await axios.get('http://localhost:3005/api/item/new');
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/item/new`
+    );
     const selectNew = await res.data;
     // const url = 'http://localhost:3005/api/item/new';
     // const response = await fetch(url);
@@ -207,7 +209,7 @@ export async function getServerSideProps({
   }
 
   const body = { keyword, genre, orderBy, order, page, take };
-  const url = 'http://localhost:3005/api/search';
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/search`;
   const response = axios.post(url, body);
   const data = await (await response).data;
   // // const params = {

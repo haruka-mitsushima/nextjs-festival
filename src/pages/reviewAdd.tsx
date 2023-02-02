@@ -69,7 +69,10 @@ export default function Review({ item }: { item: Item }) {
     };
 
     await axios
-      .post('http://localhost:3005/api/review/createReview', body)
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/review/createReview`,
+        body
+      )
       .then(() => {
         router.push(`/items/${item.itemId}`); //e.preventDefault()を行なった為、クライアント側の遷移処理をここで行う
       });
@@ -130,7 +133,7 @@ export default function Review({ item }: { item: Item }) {
 
 export const getServerSideProps = withIronSessionSsr(
   async ({ req, query }) => {
-    const url = `http://localhost:3005/api/item/getItemById/${query.itemId}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/item/getItemById/${query.itemId}`;
     const response = await axios.get(url);
     const item = await response.data;
     if (!req.session.user) {
